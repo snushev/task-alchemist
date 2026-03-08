@@ -1,4 +1,3 @@
-from typing import override
 from django.db import models
 
 # Create your models here.
@@ -9,6 +8,14 @@ class Project(models.Model):
     description: str = models.TextField(max_length=300)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    @override
+    def __str__(self) -> str:
+        return self.title
+
+
+class Task(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tasks")
+    title = models.CharField(max_length=100)
+    is_completed = models.BooleanField(default=False)
+
     def __str__(self) -> str:
         return self.title

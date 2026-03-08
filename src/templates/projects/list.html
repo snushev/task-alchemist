@@ -1,0 +1,10 @@
+{% for project in projects %}
+<ul>
+  <li>
+    Project title: {{ project.title}}
+    project description: {{ project.description }}
+  </li>
+</ul>
+{% empty %}
+No files added yet
+{% endfor %}
