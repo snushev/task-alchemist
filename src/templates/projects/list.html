@@ -1,8 +1,8 @@
 {% for project in projects %}
 <ul>
   <li>
-    Project title: {{ project.title}}
-    project description: {{ project.description }}
+    <p>roject title: </p><a href="{% url 'project_detail' project.pk %}">{{ project.title}}</a>
+    <p>project description: {{ project.description }}</p>
   </li>
 </ul>
 {% empty %}

@@ -1,0 +1,15 @@
+<h2>
+  {{ project.title }}
+</h2>
+{% for task in project.tasks.all %}
+<ul>
+  <li>
+    <p>Task: {{ task.title }}</p>
+    <p>Status: {{ task.is_completed }}</p>
+  </li>
+</ul>
+{% empty %}
+<h4>
+  No tasks yet.
+</h4>
+{% endfor %}
