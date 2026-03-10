@@ -44,3 +44,42 @@ class ProjectDetailTest(TestCase):
         url = reverse("project_detail", kwargs={"pk": project.pk})
         response = self.client.get(url)
         self.assertEqual(response.context["project"].tasks.count(), 2)
+
+
+class ProjectCreateTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="creator", password="password123")
+
+    def test_project_create_post(self):
+        self.client.login(username="creator", password="password123")
+        url = reverse("project_create")
+        data = {"title": "New Project", "description": "Success!"}
+
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Project.objects.count(), 1)
+        self.assertEqual(Project.objects.first().owner, self.user)
+
+
+class ProjectSecurityTest(TestCase):
+    def setUp(self):
+        self.user1 = User.objects.create_user(username="user1", password="123")
+        self.user2 = User.objects.create_user(username="user2", password="123")
+        self.project1 = Project.objects.create(title="User1 Project", owner=self.user1)
+
+    def test_unauthorized_update(self):
+        self.client.login(username="user2", password="123")
+        url = reverse("project_edit", kwargs={"pk": self.project1.pk})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+
+def test_project_delete_post(self):
+    self.client.login(username="user1", password="123")
+    url = reverse("project_delete", kwargs={"pk": self.project1.pk})
+
+    response = self.client.post(url)
+    self.assertEqual(response.status_code, 302)
+    self.assertEqual(Project.objects.count(), 0)
