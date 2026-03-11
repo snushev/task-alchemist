@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "automation",
-    "projects",
+    "projects.apps.ProjectsConfig",
     "users",
     "vault",
 ]

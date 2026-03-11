@@ -83,3 +83,29 @@ def test_project_delete_post(self):
     response = self.client.post(url)
     self.assertEqual(response.status_code, 302)
     self.assertEqual(Project.objects.count(), 0)
+
+
+class TaskViewTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="tasker", password="password123")
+        self.other_user = User.objects.create_user(
+            username="hacker", password="password123"
+        )
+        self.project = Project.objects.create(title="My Project", owner=self.user)
+        self.client.login(username="tasker", password="password123")
+
+    def test_task_create_post(self):
+        url = reverse("task_create", kwargs={"pk": self.project.pk})
+        data = {"title": "New Task"}
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)  # Redirect към project_detail
+        self.assertEqual(Task.objects.count(), 1)
+        self.assertEqual(Task.objects.first().project, self.project)
+
+    def test_task_create_security(self):
+        self.client.login(username="hacker", password="password123")
+        url = reverse("task_create", kwargs={"pk": self.project.pk})
+        response = self.client.post(url, {"title": "I am a hacker"})
+
+        self.assertEqual(response.status_code, 404)
