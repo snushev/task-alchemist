@@ -22,12 +22,8 @@ services:
       - ./src:/app
     ports:
       - "8000:8000"
-    environment:
-      - DEBUG=1
-      - DB_NAME=alchemist_db
-      - DB_USER=postgres
-      - DB_PASS=postgres
-      - DB_HOST=db
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy

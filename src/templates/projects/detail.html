@@ -16,3 +16,16 @@
   No tasks yet.
 </h4>
 {% endfor %}
+{% for secret in project.vault.secrets.all %}
+<div class="secret-item" style="margin-bottom: 10px;">
+    <strong>{{ secret.name }}:</strong>
+    
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <input type="password" value="{{ secret.decrypted_value }}" id="secret-{{ secret.id }}" readonly>
+ 
+      <a href="{% url 'secret_update' secret.pk %}">Edit</a>
+    </div>
+</div>
+{% empty %}
+  <h4>No secrets in the vault yet.</h4>
+{% endfor %}
