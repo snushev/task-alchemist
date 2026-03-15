@@ -10,6 +10,7 @@ from django.views.generic import (
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.cache import cache
+from django.contrib.auth.decorators import login_required
 from .models import Project, Task
 from .forms import ProjectForm, TaskForm
 from vault.models import Secret
@@ -142,6 +143,7 @@ def index_view(request):
     return render(request, "home.html")
 
 
+@login_required
 def task_toggle(request, pk):
     task = get_object_or_404(Task, pk=pk)
     task.is_completed = not task.is_completed

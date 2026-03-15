@@ -2,13 +2,16 @@ import os
 from cryptography.fernet import Fernet
 from projects.models import Project
 from django.db import models
-from django.conf import settings
+
 
 # Create your models here.
 
 
-FERNET_KEY = os.environ.get("ENCRYPTION_KEY")
-cipher = Fernet(FERNET_KEY.encode())
+def get_cipher():
+    key = os.environ.get("ENCRYPTION_KEY")
+    if not key:
+        raise ValueError("ENCRYPTION_KEY environment variable is not set")
+    return Fernet(key.encode())
 
 
 class Vault(models.Model):
@@ -27,14 +30,14 @@ class Secret(models.Model):
 
     def save(self, *args, **kwargs):
         if self.value and not self.value.startswith("gAAAAA"):
-            encrypted_value = cipher.encrypt(self.value.encode())
+            encrypted_value = get_cipher().encrypt(self.value.encode())
             self.value = encrypted_value.decode()
         super().save(*args, **kwargs)
 
     @property
     def decrypted_value(self):
         try:
-            decrypted = cipher.decrypt(self.value.encode())
+            decrypted = get_cipher().decrypt(self.value.encode())
             return decrypted.decode()
         except Exception:
             return "Decipher error"
