@@ -84,7 +84,7 @@ REDIS_URL=redis://redis:6379/1
 ```bash
 docker compose up --build
 ```
-```
+
 
 ### 4. Apply migrations & create admin
 
@@ -113,7 +113,7 @@ task-alchemist/
 ├── docker-compose.yaml  # Orchestrates App, DB, and Redis
 ├── requirements.txt     # Python dependencies
 └── .env                 # Environment secrets (ignored by Git)
-```
+
 ```
 
 ---
