@@ -1,24 +1,57 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.generic import ListView, DetailView, CreateView, DeleteView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    DeleteView,
+    TemplateView,
+)
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.cache import cache
 from .models import Project, Task
 from .forms import ProjectForm, TaskForm
+from vault.models import Secret
 
 # Create your views here.
 
 
-class ProjectListView(ListView):
-    model = Project
-    template_name = "projects/list.html"
-    context_object_name = "projects"
+class DashboardView(LoginRequiredMixin, TemplateView):
+    template_name = "projects/dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        cache_key = f"user_stats_{user.id}"
+
+        stats = cache.get(cache_key)
+        if not stats:
+            stats = {
+                "total_projects": Project.objects.filter(owner=user).count(),
+                "active_tasks": Task.objects.filter(
+                    project__owner=user, is_completed=False
+                ).count(),
+                "total_secrets": Secret.objects.filter(
+                    vault__project__owner=user
+                ).count(),
+            }
+            cache.set(cache_key, stats, 300)
+
+        context.update(stats)
+        context["recent_projects"] = Project.objects.filter(owner=user).order_by("-id")[
+            :5
+        ]
+        return context
 
 
-class ProjectDetailView(DetailView):
+class ProjectDetailView(LoginRequiredMixin, DetailView):
     model = Project
     template_name = "projects/detail.html"
     context_object_name = "project"
+
+    def get_queryset(self):
+        return Project.objects.filter(owner=self.request.user)
 
 
 class ProjectCreateView(LoginRequiredMixin, CreateView):
@@ -101,3 +134,16 @@ class TaskDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         task = self.get_object()
         return self.request.user == task.project.owner
+
+
+def index_view(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+    return render(request, "home.html")
+
+
+def task_toggle(request, pk):
+    task = get_object_or_404(Task, pk=pk)
+    task.is_completed = not task.is_completed
+    task.save()
+    return redirect("project_detail", pk=task.project.pk)

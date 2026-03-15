@@ -1,31 +1,60 @@
-<h2>
-  {{ project.title }}
-  <p>
-  Owned by: {{ project.owner.username }}
-  </p>
-</h2>
-{% for task in project.tasks.all %}
-<ul>
-  <li>
-    <p>Task: {{ task.title }}</p>
-    <p>Status: {{ task.is_completed }}</p>
-  </li>
-</ul>
-{% empty %}
-<h4>
-  No tasks yet.
-</h4>
-{% endfor %}
-{% for secret in project.vault.secrets.all %}
-<div class="secret-item" style="margin-bottom: 10px;">
-    <strong>{{ secret.name }}:</strong>
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-8 flex justify-between items-start">
+        <div>
+            <h1 class="text-4xl font-black text-slate-900">{{ project.title }}</h1>
+            <p class="text-gray-500 mt-2">{{ project.description }}</p>
+        </div>
+        <div class="flex gap-2">
+             <a href="{% url 'project_update' project.pk %}" class="text-sm border px-3 py-1 rounded hover:bg-gray-100">Edit</a>
+             <a href="{% url 'project_delete' project.pk %}" class="text-sm border border-red-200 text-red-600 px-3 py-1 rounded hover:bg-red-50">Delete</a>
+        </div>
+    </div>
+
+    <div class="bg-slate-900 rounded-2xl p-6 mb-8 text-white shadow-xl border-t-4 border-blue-500">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-mono uppercase tracking-widest text-blue-400">Secure Vault</h3>
+            <a href="{% url 'secret_create' project.pk %}" class="text-xs bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">Add Secret</a>
+        </div>
+        <div class="space-y-4">
+            {% for secret in project.vault.secrets.all %}
+            <div class="bg-slate-800 p-4 rounded-lg border border-slate-700">
+                <p class="text-xs text-slate-400 uppercase mb-1">{{ secret.name }}</p>
+                <code class="text-green-400 font-mono break-all">{{ secret.decrypted_value }}</code>
+            </div>
+            {% empty %}
+            <p class="text-slate-500 italic text-sm text-center">Vault is empty.</p>
+            {% endfor %}
+        </div>
+    </div>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mt-8">
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-bold text-slate-900">Tasks</h3>
+        <a href="{% url 'task_create' project.pk %}" class="text-sm bg-blue-50 text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-blue-100">+ Add Task</a>
+    </div>
     
-    <div style="display: flex; gap: 10px; align-items: center;">
-      <input type="password" value="{{ secret.decrypted_value }}" id="secret-{{ secret.id }}" readonly>
- 
-      <a href="{% url 'secret_update' secret.pk %}">Edit</a>
+    <div class="space-y-3">
+        {% for task in project.tasks.all %}
+        <div class="group flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition border border-transparent hover:border-gray-200">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'task_toggle' task.pk %}" class="w-6 h-6 flex items-center justify-center rounded-full border-2 transition-all 
+                    {% if task.is_completed %}bg-green-500 border-green-500 text-white{% else %}border-gray-300 bg-white hover:border-blue-500{% endif %}">
+                    {% if task.is_completed %}✓{% endif %}
+                </a>
+                <span class="font-medium {% if task.is_completed %}line-through text-gray-400{% else %}text-slate-700{% endif %}">
+                    {{ task.title }}
+                </span>
+            </div>
+            <div class="flex gap-3 opacity-0 group-hover:opacity-100 transition">
+                <a href="{% url 'task_update' task.pk %}" class="text-gray-400 hover:text-blue-600 text-sm">Edit</a>
+                <a href="{% url 'task_delete' task.pk %}" class="text-gray-400 hover:text-red-600 text-sm">Delete</a>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center text-gray-400 py-4 italic">No tasks yet. Get to work!</p>
+        {% endfor %}
     </div>
 </div>
-{% empty %}
-  <h4>No secrets in the vault yet.</h4>
-{% endfor %}
+</div>
+{% endblock %}

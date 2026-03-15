@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <p class="text-gray-500 text-sm uppercase font-bold">Total Projects</p>
+        <p class="text-3xl font-black text-blue-600">{{ total_projects }}</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <p class="text-gray-500 text-sm uppercase font-bold">Active Tasks</p>
+        <p class="text-3xl font-black text-orange-500">{{ active_tasks }}</p>
+    </div>
+    <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+        <p class="text-gray-500 text-sm uppercase font-bold">Secrets in Vault</p>
+        <p class="text-3xl font-black text-red-600">{{ total_secrets }}</p>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="p-6 border-b flex justify-between items-center">
+        <h2 class="text-xl font-bold">Recent Projects</h2>
+        <a href="{% url 'project_create' %}" class="text-sm bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 transition">+ New Project</a>
+    </div>
+    <ul class="divide-y divide-gray-100">
+        {% for p in recent_projects %}
+        <li class="p-6 hover:bg-gray-50 flex justify-between items-center">
+            <div>
+                <a href="{% url 'project_detail' p.pk %}" class="text-lg font-bold text-blue-600 hover:underline">{{ p.title }}</a>
+                <p class="text-sm text-gray-500">{{ p.description|truncatechars:60 }}</p>
+            </div>
+            <span class="text-xs font-mono bg-gray-100 px-2 py-1 rounded text-gray-400">#{{ p.id }}</span>
+        </li>
+        {% empty %}
+        <li class="p-10 text-center text-gray-400">No projects yet. Start by creating one!</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

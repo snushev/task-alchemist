@@ -1,7 +1,9 @@
 django
 psycopg2-binary
 redis
-celery
 cryptography
 python-dotenv
-
+django-redis
+django-tailwind
+whitenoise
+gunicorn

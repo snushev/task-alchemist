@@ -1,5 +1,19 @@
-<p>Are you sure you want to delete {{ object.title }}</p>
-<form method="POST">
-  {% csrf_token %}
-  <button type="submit">Submit</button>
-</form>
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto text-center py-10">
+    <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">⚠️</div>
+    <h1 class="text-3xl font-black text-slate-900 mb-4">Are you sure?</h1>
+    <p class="text-gray-500 mb-8">You are about to delete <span class="font-bold text-slate-900">"{{ object.title }}"</span>. This will also destroy all associated tasks and vault secrets!</p>
+    
+    <form method="post" class="flex gap-4">
+        {% csrf_token %}
+        <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition">
+            Yes, Delete It
+        </button>
+        <a href="{% url 'project_detail' object.pk %}" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-lg text-center transition">
+            Nevermind
+        </a>
+    </form>
+</div>
+{% endblock %}

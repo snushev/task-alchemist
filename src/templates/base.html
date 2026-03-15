@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Alchemist{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+
+  <nav class="bg-slate-900 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <a href="{% url 'home' %}" class="text-2xl font-black tracking-tighter text-blue-400">
+            🧪 ALCHEMIST
+          </a>
+          {% if user.is_authenticated %}
+          <div class="ml-10 flex space-x-4 text-sm font-medium">
+            <a href="{% url 'dashboard' %}" class="hover:text-blue-400 transition">Dashboard</a>
+            <a href="{% url 'project_create' %}" class="hover:text-blue-400 transition">New Project</a>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="flex items-center space-x-4">
+          {% if user.is_authenticated %}
+          <span class="text-gray-400 text-sm italic">{{ user.username }}</span>
+          <form action="{% url 'logout' %}" method="post" class="m-0">
+            {% csrf_token %}
+            <button type="submit"
+              class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm font-bold transition">
+              Logout
+            </button>
+          </form>
+          {% else %}
+          <a href="{% url 'login' %}" class="text-sm font-bold hover:text-blue-400 transition">Login</a>
+          <a href="{% url 'register' %}"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-bold transition">
+            Sign Up
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    {% if messages %}
+    <div class="mb-6">
+      {% for message in messages %}
+      <div
+        class="p-4 rounded-md {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="bg-white border-t border-gray-200 py-6">
+    <div class="text-center text-gray-500 text-xs">
+      &copy; 2026 Task Alchemist.
+    </div>
+  </footer>
+
+</body>
+
+</html>

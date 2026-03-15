@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center py-20 text-center">
+  <div
+    class="inline-block px-4 py-1.5 mb-6 text-sm font-semibold tracking-wide text-blue-600 uppercase bg-blue-100 rounded-full">
+    v1.0 is now live
+  </div>
+  <h1 class="text-6xl font-black text-slate-900 mb-6 leading-tight">
+    The Alchemist's <span class="text-blue-600">Secure</span> <br> Task Workspace
+  </h1>
+  <p class="text-xl text-gray-600 mb-10 max-w-2xl">
+    Manage your development projects while keeping your sensitive environment variables and API keys in an encrypted,
+    Redis-powered vault.
+  </p>
+  <div class="flex gap-4">
+    <a href="{% url 'register' %}"
+      class="bg-slate-900 text-white px-10 py-4 rounded-xl font-bold hover:bg-slate-800 shadow-2xl transition-all transform hover:-translate-y-1">
+      Create Account
+    </a>
+    <a href="{% url 'login' %}"
+      class="bg-white text-slate-900 border border-gray-200 px-10 py-4 rounded-xl font-bold hover:bg-gray-50 transition-all">
+      Sign In
+    </a>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+  <div class="p-8 bg-white border border-gray-100 rounded-2xl shadow-sm">
+    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-2xl">🏗️</div>
+    <h3 class="text-xl font-bold mb-2">Projects</h3>
+    <p class="text-gray-500">Organize your work into manageable projects with detailed task tracking.</p>
+  </div>
+  <div class="p-8 bg-white border border-gray-100 rounded-2xl shadow-sm">
+    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 text-2xl">🔑</div>
+    <h3 class="text-xl font-bold mb-2">Vault</h3>
+    <p class="text-gray-500">AES-256 encryption for your secrets. Decrypted only when you need them.</p>
+  </div>
+  <div class="p-8 bg-white border border-gray-100 rounded-2xl shadow-sm">
+    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 text-2xl">⚡</div>
+    <h3 class="text-xl font-bold mb-2">Fast</h3>
+    <p class="text-gray-500">Integrated Redis caching ensures your dashboard loads in milliseconds.</p>
+  </div>
+</div>
+{% endblock %}

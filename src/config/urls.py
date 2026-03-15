@@ -17,9 +17,12 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from projects.views import index_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("users/", include("users.urls")),
     path("projects/", include("projects.urls")),
     path("vault/", include("vault.urls")),
+    path("", index_view, name="home"),
 ]
