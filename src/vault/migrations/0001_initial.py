@@ -5,28 +5,57 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('projects', '0003_project_owner'),
+        ("projects", "0003_project_owner"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Vault',
+            name="Vault",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('project', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='vault', to='projects.project')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "project",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="vault",
+                        to="projects.project",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Secret',
+            name="Secret",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('value', models.TextField()),
-                ('vault', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='secrets', to='vault.vault')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("value", models.TextField()),
+                (
+                    "vault",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="secrets",
+                        to="vault.vault",
+                    ),
+                ),
             ],
         ),
     ]
