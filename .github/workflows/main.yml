@@ -58,8 +58,8 @@ jobs:
           DB_PASS: postgres
           DB_HOST: localhost
           SECRET_KEY: "test-secret"
-          REDIS_URL: redis://redis:6379/1
-          CACHE_URL: redis://redis:6379/1
+          REDIS_URL: redis://localhost:6379/1
+          CACHE_URL: redis://localhost:6379/1
         run: |
           python manage.py migrate
           python manage.py test
