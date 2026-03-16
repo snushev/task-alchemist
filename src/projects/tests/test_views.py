@@ -71,7 +71,7 @@ class ProjectSecurityTest(TestCase):
 
     def test_unauthorized_update(self):
         self.client.login(username="user2", password="123")
-        url = reverse("project_edit", kwargs={"pk": self.project1.pk})
+        url = reverse("project_update", kwargs={"pk": self.project1.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 

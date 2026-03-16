@@ -87,7 +87,7 @@ class ProjectDeleteView(UserPassesTestMixin, DeleteView):
     template_name = "projects/delete.html"
 
     def get_success_url(self):
-        return reverse("projects")
+        return reverse("dashboard")
 
     def test_func(self):
         project = self.get_object()
