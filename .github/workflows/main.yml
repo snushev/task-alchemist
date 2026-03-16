@@ -44,7 +44,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Wait for Postgres
         run: |
-          until pg_isready -h postgres -p 5432; do
+          until pg_isready -h localhost -p 5432; do
             echo "Waiting for postgres..."
             sleep 2
           done
