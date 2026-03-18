@@ -4,8 +4,6 @@
 
 **Task Alchemist** is a self-hosted project management web application built with Django. It combines task tracking with a built-in **encrypted secrets vault** per project, so your API keys and credentials live alongside the work that needs them.
 
-
-
 ---
 
 ## ✨ Features
@@ -31,6 +29,7 @@
 | **Frontend** | Tailwind CSS |
 | **Server** | Gunicorn + WhiteNoise |
 | **Containers** | Docker & Docker Compose |
+| **Orchestration** | Kubernetes (K8s) |
 
 ---
 
@@ -85,7 +84,6 @@ REDIS_URL=redis://redis:6379/1
 docker compose up --build
 ```
 
-
 ### 4. Apply migrations & create admin
 
 ```bash
@@ -94,7 +92,78 @@ docker compose exec app python manage.py createsuperuser
 ```
 
 ### 5. Open in browser
+
 Access the application at `http://localhost:8000`.
+
+---
+
+## ☸️ Kubernetes Deployment
+
+The application can also be deployed on a Kubernetes cluster. All manifests live in the `kubernetes/` directory.
+
+### Kubernetes Manifest Structure
+
+```text
+kubernetes/
+├── namespace.yaml            # Dedicated namespace for the app
+├── config.yaml               # ConfigMaps (non-secret env vars)
+├── secrets.yaml              # K8s Secrets (base64-encoded credentials)
+├── deployment.yaml           # Django app Deployment
+├── service.yaml              # Service exposing the Django app
+├── redis.yaml                # Redis Deployment + Service
+├── postgres-deployment.yaml  # PostgreSQL Deployment
+├── postgres-service.yaml     # PostgreSQL Service
+├── postgres-pv.yaml          # PostgreSQL PersistentVolume
+├── postgres-pvc.yaml         # PostgreSQL PersistentVolumeClaim
+└── django-static-pvc.yaml    # PVC for Django static files
+```
+
+### Deploy to Kubernetes
+
+Apply the manifests in the following order:
+
+```bash
+# 1. Create the namespace first
+kubectl apply -f kubernetes/namespace.yaml
+
+# 2. Apply config and secrets
+kubectl apply -f kubernetes/config.yaml
+kubectl apply -f kubernetes/secrets.yaml
+
+# 3. Set up persistent storage
+kubectl apply -f kubernetes/postgres-pv.yaml
+kubectl apply -f kubernetes/postgres-pvc.yaml
+kubectl apply -f kubernetes/django-static-pvc.yaml
+
+# 4. Deploy services
+kubectl apply -f kubernetes/redis.yaml
+kubectl apply -f kubernetes/postgres-deployment.yaml
+kubectl apply -f kubernetes/postgres-service.yaml
+
+# 5. Deploy the app
+kubectl apply -f kubernetes/deployment.yaml
+kubectl apply -f kubernetes/service.yaml
+```
+
+Or apply everything at once (order is handled by K8s internally, but namespace must exist first):
+
+```bash
+kubectl apply -f kubernetes/namespace.yaml
+kubectl apply -f kubernetes/
+```
+
+### Verify the deployment
+
+```bash
+# Check all resources in the namespace
+kubectl get all -n task-alchemist
+
+# Run migrations inside the pod
+kubectl exec -n task-alchemist deploy/task-alchemist -- python manage.py migrate
+
+# Create a superuser
+kubectl exec -it -n task-alchemist deploy/task-alchemist -- python manage.py createsuperuser
+```
 
 ---
 
@@ -109,11 +178,11 @@ task-alchemist/
 │   ├── users/           # Authentication & User profiles
 │   ├── templates/       # HTML templates (Tailwind-styled)
 │   └── theme/           # Tailwind theme configuration
+├── kubernetes/          # Kubernetes manifests
 ├── Dockerfile           # Multi-stage-ready production build
 ├── docker-compose.yaml  # Orchestrates App, DB, and Redis
 ├── requirements.txt     # Python dependencies
 └── .env                 # Environment secrets (ignored by Git)
-
 ```
 
 ---
@@ -121,8 +190,6 @@ task-alchemist/
 ## 🔐 How the Vault Works
 
 Every project automatically gets a **Vault** created via a Django signal on `post_save`. Secrets stored in a vault are encrypted with Fernet before hitting the database.
-
-
 
 - **Encryption**: `User input → Fernet.encrypt(value) → Ciphertext stored in DB`
 - **Decryption**: `Retrieved Ciphertext → Fernet.decrypt(value) → Decrypted output`
@@ -135,9 +202,9 @@ The encryption key is strictly pulled from the environment and is never stored i
 
 Planned upgrades for the Task Alchemist infrastructure:
 
+- [x] **Orchestration**: Kubernetes (K8s) manifests for production-grade deployment.
+- [x] **CI/CD**: Automated testing and deployment pipelines via **GitHub Actions**.
 - [ ] **Infrastructure as Code (IaC)**: Automated provisioning with **Terraform**.
-- [ ] **Orchestration**: Transition from Compose to **Kubernetes (K8s)** with Helm charts.
-- [ ] **CI/CD**: Automated testing and deployment pipelines via **GitHub Actions**.
 - [ ] **Observability**: Real-time monitoring with **Prometheus** & **Grafana**.
 - [ ] **Cloud Storage**: Offloading media and static assets to AWS S3.
 
@@ -155,3 +222,4 @@ Planned upgrades for the Task Alchemist infrastructure:
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE) for details.
+

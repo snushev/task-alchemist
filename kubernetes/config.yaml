@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alchemist-config
+  namespace: alchemist
+data:
+  DEBUG: "0"
+  ALLOWED_HOSTS: "*"
+  POSTGRES_DB: "alchemist_db"
+  POSTGRES_USER: "postgres"
+  DB_NAME: "alchemist_db"
+  DB_USER: "postgres"
+  DB_HOST: "postgres-service"

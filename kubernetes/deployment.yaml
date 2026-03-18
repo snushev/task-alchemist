@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: task-alchemist
+  name: task-alchemist
+  namespace: alchemist
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: task-alchemist
+  template:
+    metadata:
+      labels:
+        app: task-alchemist
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.28
+          command:
+            [
+              "sh",
+              "-c",
+              "until nc -vz postgres-service 5432; do echo waiting for postgres; sleep 2; done;",
+            ]
+        - name: copy-static
+          image: snushev/task-alchemist:latest
+          command: ["sh", "-c", "python manage.py collectstatic --noinput"]
+          volumeMounts:
+            - name: django-static-storage
+              mountPath: /app/staticfiles
+      containers:
+        - image: snushev/task-alchemist:latest
+          imagePullPolicy: Always
+          name: task-alchemist
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          envFrom:
+            - configMapRef:
+                name: alchemist-config
+            - secretRef:
+                name: alchemist-secrets
+          volumeMounts:
+            - name: django-static-storage
+              mountPath: /app/staticfiles
+      volumes:
+        - name: django-static-storage
+          persistentVolumeClaim:
+            claimName: django-static-pvc
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
